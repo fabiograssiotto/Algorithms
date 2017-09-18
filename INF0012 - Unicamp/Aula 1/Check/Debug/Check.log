@@ -1,0 +1,5 @@
+﻿  CheckTheCheck.cpp
+d:\development\inf0012 - unicamp\aula 1\check\checkthecheck.cpp(282): warning C4715: 'diagPieceCheck': not all control paths return a value
+d:\development\inf0012 - unicamp\aula 1\check\checkthecheck.cpp(410): warning C4715: 'checkDiag': not all control paths return a value
+  Check.vcxproj -> D:\Development\INF0012 - Unicamp\Aula 1\Debug\Check.exe
+  Check.vcxproj -> D:\Development\INF0012 - Unicamp\Aula 1\Debug\Check.pdb (Partial PDB)
