@@ -44,14 +44,8 @@ bool findWord(char* str) {
 			// found the word, reduce the count
 			ptr->count--;
 			if (ptr->count == 0) {
-				// remove the node.
-				if (ptr->next != NULL) {
-					delete ptr;
-					ptr = ptr->next;
-				}
-				else {
-					delete ptr;
-				}
+				delete ptr;
+				ptr = NULL;
 			}
 			return true;
 		}
