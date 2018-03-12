@@ -17,14 +17,14 @@ The third line contains n space-separated strings denoting the words present in 
 #include <cstring>
 using namespace std;
 
-struct hashNode {
+struct HashNode {
 	char str[6];
 	int count; // For the number of times this word appears in the dictionary.
-	hashNode* next;
+	HashNode* next;
 };
 
 const int HASH_SIZE = 500000;
-hashNode* hashTable[HASH_SIZE];
+HashNode* hashTable[HASH_SIZE];
 
 int hashFunc(char* str) {
 	int hash = 7;
@@ -32,6 +32,41 @@ int hashFunc(char* str) {
 		hash = hash * 31 + *(str+i);
 	}
 	return hash % HASH_SIZE;
+}
+
+// Tries to find the word in the hash table.
+bool findWord(char* str) {
+	int hashPos = hashFunc(str);
+	HashNode* ptr = hashTable[hashPos];
+	// Try to find in the hash table
+	while (ptr != NULL) {
+		if (strcmp(str, ptr->str) == 0) {
+			// found the word, reduce the count
+			ptr->count--;
+			if (ptr->count == 0) {
+				// remove the node.
+				if (ptr->next != NULL) {
+					delete ptr;
+					ptr = ptr->next;
+				}
+				else {
+					delete ptr;
+				}
+			}
+			return true;
+		}
+		else {
+			// not found, check for any other words in this hash list
+			if (ptr->next != NULL) {
+				ptr = ptr->next;
+				break;
+			}
+			else {
+				// cannot find in the table list.
+				return false;
+			}
+		}
+	}
 }
 
 int main() {
@@ -49,7 +84,7 @@ int main() {
 		int hashPos = hashFunc(word);
 		if (hashTable[hashPos] == NULL) {
 			// ie hash is empty at the position.
-			hashNode* newNode = new hashNode();
+			HashNode* newNode = new HashNode();
 			strcpy(newNode->str, word);
 			newNode->count = 1;
 			newNode->next = NULL;
@@ -57,7 +92,7 @@ int main() {
 		}
 		else {
 			// Same string, or collision?
-			hashNode* ptr = hashTable[hashPos];
+			HashNode* ptr = hashTable[hashPos];
 			bool isNewWord = true;
 
 			int cmp = strcmp(ptr->str, word);
@@ -76,7 +111,7 @@ int main() {
 				ptr = ptr->next;
 			}
 			if (isNewWord) {
-				hashNode* newNode = new hashNode();
+				HashNode* newNode = new HashNode();
 				strcpy(newNode->str, word);
 				newNode->next = NULL;
 				ptr->next = newNode;
@@ -88,26 +123,16 @@ int main() {
 	}
 
 	// Read ransom words and try to find them in the magazine.
-	/*
 	for (int i = 0; i < n; i++) {
 		bool wordFound = false;
 		char ransomWord[6];
 		cin >> ransomWord;
-		for (int j = 0; j < m; j++) {
-			if (strcmp(ransomWord, magazineWords[j]) == 0 && wordUsed[j] != true) {
-				// word found
-				wordFound = true;
-				wordUsed[j] = true;
-				break;
-			}
-		}
-		if (wordFound == false) {
+		if (!findWord(ransomWord)) {
 			// word not found, so stop now the search.
 			missingWords = true;
 			break;
 		}
 	}
-	*/
 
 	if (missingWords) {
 		cout << "No" << endl;
@@ -115,5 +140,4 @@ int main() {
 	else {
 		cout << "Yes" << endl;
 	}
-	
 }
