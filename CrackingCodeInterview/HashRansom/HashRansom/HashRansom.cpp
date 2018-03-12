@@ -37,23 +37,23 @@ int hashFunc(char* str) {
 // Tries to find the word in the hash table.
 bool findWord(char* str) {
 	int hashPos = hashFunc(str);
-	HashNode* ptr = hashTable[hashPos];
+	HashNode** ptr = &hashTable[hashPos];
 	// Try to find in the hash table
-	while (ptr != NULL) {
-		if (strcmp(str, ptr->str) == 0) {
+	while (*ptr != NULL) {
+		if (strcmp(str, (*ptr)->str) == 0) {
 			// found the word, reduce the count
-			ptr->count--;
-			if (ptr->count == 0) {
-				delete ptr;
-				ptr = NULL;
+			(*ptr)->count--;
+			if ((*ptr)->count == 0) {	
+				delete *ptr;
+				*ptr = NULL;
 			}
 			return true;
 		}
 		else {
 			// not found, check for any other words in this hash list
-			if (ptr->next != NULL) {
-				ptr = ptr->next;
-				break;
+			if ((*ptr)->next != NULL) {
+				*ptr = (*ptr)->next;
+				continue;
 			}
 			else {
 				// cannot find in the table list.
@@ -61,6 +61,8 @@ bool findWord(char* str) {
 			}
 		}
 	}
+	// Not found in the array position.
+	return false; 
 }
 
 int main() {
@@ -107,6 +109,7 @@ int main() {
 			if (isNewWord) {
 				HashNode* newNode = new HashNode();
 				strcpy(newNode->str, word);
+                newNode->count = 1;
 				newNode->next = NULL;
 				ptr->next = newNode;
 			}
