@@ -1,55 +1,119 @@
+/*
+A kidnapper wrote a ransom note but is worried it will be traced back to him. He found a magazine and wants to know
+if he can cut out whole words from it and use them to create an untraceable replica of his ransom note.
+The words in his note are case-sensitive and he must use whole words available in the magazine, meaning 
+he cannot use substrings or concatenation to create the words he needs.
+
+Given the words in the magazine and the words in the ransom note, print Yes if he can replicate his ransom note exactly
+using whole words from the magazine; otherwise, print No.
+
+Input Format
+The first line contains two space-separated integers describing the respective values of m (the number of words in the
+magazine) and n (the number of words in the ransom note).
+The second line contains m space-separated strings denoting the words present in the magazine.
+The third line contains n space-separated strings denoting the words present in the ransom note.
+*/
 #include <iostream>
-#include <vector>
-#include <string>
-#include <list>
+#include <cstring>
 using namespace std;
 
-// Make the hash table very large to avoid collisions.
-list<string> hashTable[30000];
+struct hashNode {
+	char str[6];
+	int count; // For the number of times this word appears in the dictionary.
+	hashNode* next;
+};
 
-int hashCode(string input) {
-	// Simple hash code
-	int hashval;
+const int HASH_SIZE = 500000;
+hashNode* hashTable[HASH_SIZE];
 
-	for (hashval = 0; *s != '\0'; s++)
-		hashval = *s + 31 * hashval;
-	return hashval % HASHSIZE;
-}
-
-
-void put(string input) {
-	int hash = hashCode(input);
-	hashTable[hash].push_front(input);
-}
-
-
-bool ransom_note(vector<string> magazine, vector<string> ransom) {
-	// Create a hash table for all the words in the magazine.
-	for (int i = 0; i < magazine.size(); i++) {
-		put(magazine[i]);
+int hashFunc(char* str) {
+	int hash = 7;
+	for (unsigned int i = 0; i < strlen(str); i++) {
+		hash = hash * 31 + *(str+i);
 	}
-
-	// Now check if the note words can be found in the hash table.
-	// If a word is found, remove it to account for duplicate words.
-		
-	return false;
+	return hash % HASH_SIZE;
 }
 
 int main() {
-	int m;
-	int n;
-	cin >> m >> n;
-	vector<string> magazine(m);
-	for (int magazine_i = 0; magazine_i < m; magazine_i++) {
-		cin >> magazine[magazine_i];
+	bool missingWords = false;
+	int m, n;
+	cin >> m;
+	cin >> n;
+
+	// Read in all the words in the magazine, creating hashes for them.
+	for (int i = 0; i < m; i++) {
+		char word[6];
+		memset(word, '\0', 6);
+		cin >> word;
+
+		int hashPos = hashFunc(word);
+		if (hashTable[hashPos] == NULL) {
+			// ie hash is empty at the position.
+			hashNode* newNode = new hashNode();
+			strcpy(newNode->str, word);
+			newNode->count = 1;
+			newNode->next = NULL;
+			hashTable[hashPos] = newNode;
+		}
+		else {
+			// Same string, or collision?
+			hashNode* ptr = hashTable[hashPos];
+			bool isNewWord = true;
+
+			int cmp = strcmp(ptr->str, word);
+
+			if (strcmp(ptr->str, word) == 0) {
+				isNewWord = false;
+			}
+
+			while (ptr->next != NULL && isNewWord == true) {
+				if (strcmp(ptr->str, word) == 0) {
+					// this word already appeared once, so do not create a new node,
+					// just update the existing one.
+					isNewWord = false;
+					break;
+				}
+				ptr = ptr->next;
+			}
+			if (isNewWord) {
+				hashNode* newNode = new hashNode();
+				strcpy(newNode->str, word);
+				newNode->next = NULL;
+				ptr->next = newNode;
+			}
+			else {
+				ptr->count++;
+			}
+		}
 	}
-	vector<string> ransom(n);
-	for (int ransom_i = 0; ransom_i < n; ransom_i++) {
-		cin >> ransom[ransom_i];
+
+	// Read ransom words and try to find them in the magazine.
+	/*
+	for (int i = 0; i < n; i++) {
+		bool wordFound = false;
+		char ransomWord[6];
+		cin >> ransomWord;
+		for (int j = 0; j < m; j++) {
+			if (strcmp(ransomWord, magazineWords[j]) == 0 && wordUsed[j] != true) {
+				// word found
+				wordFound = true;
+				wordUsed[j] = true;
+				break;
+			}
+		}
+		if (wordFound == false) {
+			// word not found, so stop now the search.
+			missingWords = true;
+			break;
+		}
 	}
-	if (ransom_note(magazine, ransom))
-		cout << "Yes\n";
-	else
-		cout << "No\n";
-	return 0;
+	*/
+
+	if (missingWords) {
+		cout << "No" << endl;
+	}
+	else {
+		cout << "Yes" << endl;
+	}
+	
 }
