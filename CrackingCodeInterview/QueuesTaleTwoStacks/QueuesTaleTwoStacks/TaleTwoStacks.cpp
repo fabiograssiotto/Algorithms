@@ -14,15 +14,25 @@ class MyQueue {
 public:
 	stack<int> stack_newest_on_top, stack_oldest_on_top;
 	void push(int x) {
-
+		stack_newest_on_top.push(x);
+		while (!stack_oldest_on_top.empty()) {
+			int temp = stack_oldest_on_top.top();
+			stack_oldest_on_top.pop();
+			stack_newest_on_top.push(temp);
+		}
+		while (!stack_newest_on_top.empty()) {
+			int temp = stack_newest_on_top.top();
+			stack_newest_on_top.pop();
+			stack_oldest_on_top.push(temp); 
+		}
 	}
 
 	void pop() {
-
+		stack_oldest_on_top.pop();
 	}
 
 	int front() {
-
+		return stack_oldest_on_top.top();
 	}
 };
 
